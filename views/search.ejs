@@ -1,0 +1,10 @@
+<h1>Search Results</h1>
+<% if (results && results.length > 0) { %>
+  <ul>
+    <% results.forEach(item => { %>
+      <li><%= item.name %>: <%= item.description %></li>
+    <% }) %>
+  </ul>
+<% } else { %>
+  <p>No results found.</p>
+<% } %>
