@@ -4,7 +4,7 @@ const mysql = require("mysql2");
 const request = require('request');
 
 // MySQL connection (imported from index.js)
-const db = require('../db');
+const db = require('../db.js');
 
 // Example API endpoint: Get all items from the database
 router.get('/items', (req, res) => {

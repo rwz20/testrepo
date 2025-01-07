@@ -5,13 +5,26 @@ require('dotenv').config();
 const express = require("express");
 const session = require("express-session");
 const mysql = require("mysql2");
+const ejs = require("ejs");
 const bcrypt = require("bcrypt");
 const expressSanitizer = require("express-sanitizer");
 const { check, validationResult, body } = require('express-validator');
 
 // Initialize express app
 const app = express();
-const port = process.env.PORT || 5500;
+const port = process.env.PORT || 8000;
+
+// Set up view engine (EJS)
+app.set('view engine', 'ejs');
+
+// Middleware Setup
+app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
+app.use(express.static(__dirname + "public")); // Serve static files (CSS, JS, images)
+app.use(express.json()); // Parse JSON data
+app.use(expressSanitizer()); // Sanitize user inputs
+app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
+
+
 
 // MySQL connection
 const db = mysql.createConnection({
@@ -21,15 +34,16 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME
 });
 
-// Middleware Setup
-app.use(express.static("public")); // Serve static files (CSS, JS, images)
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded data
-app.use(express.json()); // Parse JSON data
-app.use(expressSanitizer()); // Sanitize user inputs
-app.use(session({ secret: process.env.SESSION_SECRET, resave: false, saveUninitialized: false }));
+// Connect to the database
+db.connect((err) => {
+  if (err) {
+    console.error('Error connecting to the database:', err.stack);
+    return;
+  }
+  console.log('Connected to MySQL database as ID ' + db.threadId);
+});
+global.db = db
 
-// Set up view engine (EJS)
-app.set('view engine', 'ejs');
 
 // Import routes
 const apiRoutes = require('./routes/api');
